@@ -19,7 +19,6 @@ public class ComplaintService {
 
         teamMap.put("IT", "IT Team");
         teamMap.put("Maintenance", "Maintenance Team");
-        teamMap.put("Customer", "Customer Support");
         teamMap.put("Service", "Service Team");
     }
 

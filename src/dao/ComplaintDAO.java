@@ -1,17 +1,16 @@
 package dao;
 
-import java.sql.*;
 import model.Complaint;
+import java.sql.*;
 
 public class ComplaintDAO {
 
-
+    // INSERT
     public void insertComplaint(Complaint c) {
-
         try {
             Connection conn = DBConnection.getConnection();
 
-            String sql = "INSERT INTO complaints (title, description, category, severity, urgency, impact, priority, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO complaints(title, description, category, severity, urgency, impact, priority, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
             PreparedStatement ps = conn.prepareStatement(sql);
 
@@ -31,34 +30,50 @@ public class ComplaintDAO {
         }
     }
 
-    public ResultSet getComplaintsByTeam(String team) {
-
+    // USER VIEW
+    public ResultSet getComplaintsByUser() {
         try {
             Connection conn = DBConnection.getConnection();
 
-            String sql = "SELECT * FROM complaints WHERE category=? ORDER BY priority DESC";
+            String sql = "SELECT id, title, category, priority, status, created_at, updated_at FROM complaints ORDER BY priority DESC";
 
             PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, team);
 
             return ps.executeQuery();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return null;
     }
 
-  
-    public void updateStatus(int id, String status) {
+    // TEAM VIEW
+    public ResultSet getComplaintsByTeam(String category) {
+        try {
+            Connection conn = DBConnection.getConnection();
 
+            String sql = "SELECT id, title, category, priority, status, created_at, updated_at FROM complaints WHERE category=? ORDER BY priority DESC";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, category);
+
+            return ps.executeQuery();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // UPDATE STATUS
+    public void updateStatus(int id, String status) {
         try {
             Connection conn = DBConnection.getConnection();
 
             String sql = "UPDATE complaints SET status=? WHERE id=?";
 
             PreparedStatement ps = conn.prepareStatement(sql);
+
             ps.setString(1, status);
             ps.setInt(2, id);
 
@@ -69,43 +84,23 @@ public class ComplaintDAO {
         }
     }
 
-
-    public ResultSet searchByTitle(String title, String team) {
-
+    // SEARCH
+    public ResultSet searchByTitle(String title, String category) {
         try {
             Connection conn = DBConnection.getConnection();
 
-            String sql = "SELECT * FROM complaints WHERE title LIKE ? AND category=? ORDER BY priority DESC";
+            String sql = "SELECT id, title, category, priority, status, created_at, updated_at FROM complaints WHERE title LIKE ? AND category=? ORDER BY priority DESC";
 
             PreparedStatement ps = conn.prepareStatement(sql);
+
             ps.setString(1, "%" + title + "%");
-            ps.setString(2, team);
+            ps.setString(2, category);
 
             return ps.executeQuery();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return null;
-    }
-
-  
-    public ResultSet getComplaintsByUser() {
-
-        try {
-            Connection conn = DBConnection.getConnection();
-
-            String sql = "SELECT * FROM complaints ORDER BY priority DESC";
-
-            PreparedStatement ps = conn.prepareStatement(sql);
-
-            return ps.executeQuery();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         return null;
     }
 }

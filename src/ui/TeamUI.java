@@ -2,98 +2,134 @@ package ui;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.sql.ResultSet;
+
 import dao.ComplaintDAO;
 import model.User;
-import java.sql.*;
 
 public class TeamUI {
+
+    JTable table;
+    DefaultTableModel model;
+    JTextField searchField;
+    JComboBox<String> statusBox;
 
     public TeamUI(User user) {
 
         JFrame frame = new JFrame("Team Panel - " + user.getRole());
-        frame.setSize(600, 400);
-        frame.setLayout(null);
+        frame.setSize(950, 500);
+        frame.setLayout(new BorderLayout());
 
-        String[] cols = {"ID","Title","Category","Priority","Status"};
-        DefaultTableModel model = new DefaultTableModel(cols, 0);
-        JTable table = new JTable(model);
+        // TABLE
+        String[] cols = {"ID","Title","Category","Priority","Status","Created At","Updated At"};
+        model = new DefaultTableModel(cols, 0);
+        table = new JTable(model);
+
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        table.getColumnModel().getColumn(0).setPreferredWidth(50);
+        table.getColumnModel().getColumn(1).setPreferredWidth(180);
+        table.getColumnModel().getColumn(2).setPreferredWidth(120);
+        table.getColumnModel().getColumn(3).setPreferredWidth(100);
+        table.getColumnModel().getColumn(4).setPreferredWidth(120);
+        table.getColumnModel().getColumn(5).setPreferredWidth(180);
+        table.getColumnModel().getColumn(6).setPreferredWidth(180);
 
         JScrollPane scroll = new JScrollPane(table);
-        scroll.setBounds(20, 20, 550, 200);
-        frame.add(scroll);
+        frame.add(scroll, BorderLayout.CENTER);
 
+        // PANEL
+        JPanel panel = new JPanel();
+
+        // STATUS DROPDOWN
         String[] statuses = {"IN_PROGRESS", "RESOLVED", "ESCALATED"};
-        JComboBox<String> statusBox = new JComboBox<>(statuses);
-        statusBox.setBounds(20, 240, 150, 25);
-        frame.add(statusBox);
+        statusBox = new JComboBox<>(statuses);
+        panel.add(statusBox);
 
         JButton updateBtn = new JButton("Update Status");
-        updateBtn.setBounds(200, 240, 150, 30);
-        frame.add(updateBtn);
+        panel.add(updateBtn);
 
-        JTextField searchField = new JTextField();
-        searchField.setBounds(20, 290, 200, 25);
-        frame.add(searchField);
+        // SEARCH
+        searchField = new JTextField(15);
+        panel.add(searchField);
 
         JButton searchBtn = new JButton("Search by Title");
-        searchBtn.setBounds(240, 290, 180, 30);
-        frame.add(searchBtn);
+        panel.add(searchBtn);
+
+        frame.add(panel, BorderLayout.SOUTH);
 
         ComplaintDAO dao = new ComplaintDAO();
 
-        try {
-            ResultSet rs = dao.getComplaintsByTeam(user.getRole());
-
-            while(rs.next()){
-                model.addRow(new Object[]{
-                        rs.getInt("id"),
-                        rs.getString("title"),
-                        rs.getString("category"),
-                        rs.getDouble("priority"),
-                        rs.getString("status")
-                });
-            }
-
-        } catch(Exception e){
-            e.printStackTrace();
-        }
-
-        updateBtn.addActionListener(e -> {
-
-            int row = table.getSelectedRow();
-
-            if(row == -1){
-                JOptionPane.showMessageDialog(frame,"Select a complaint!");
-                return;
-            }
-
-            int id = (int) model.getValueAt(row, 0);
-            String newStatus = (String) statusBox.getSelectedItem();
-
-            dao.updateStatus(id, newStatus);
-
-            model.setValueAt(newStatus, row, 4);
-        });
-
-        searchBtn.addActionListener(e -> {
-
-            String keyword = searchField.getText();
-            model.setRowCount(0);
-
+        // LOAD FUNCTION
+        Runnable loadData = () -> {
             try {
-                ResultSet rs = dao.searchByTitle(keyword, user.getRole());
+                model.setRowCount(0);
 
-                while(rs.next()){
+                ResultSet rs = dao.getComplaintsByTeam(user.getRole());
+
+                while (rs.next()) {
                     model.addRow(new Object[]{
                             rs.getInt("id"),
                             rs.getString("title"),
                             rs.getString("category"),
                             rs.getDouble("priority"),
-                            rs.getString("status")
+                            rs.getString("status"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at")
                     });
                 }
 
-            } catch(Exception ex){
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        };
+
+        loadData.run();
+
+        // UPDATE STATUS
+        updateBtn.addActionListener(e -> {
+
+            int row = table.getSelectedRow();
+
+            if (row == -1) {
+                JOptionPane.showMessageDialog(frame, "Select a complaint first!");
+                return;
+            }
+
+            int id = (int) model.getValueAt(row, 0);
+            String status = statusBox.getSelectedItem().toString();
+
+            dao.updateStatus(id, status);
+
+            JOptionPane.showMessageDialog(frame, "Status Updated!");
+
+            loadData.run();
+        });
+
+        // SEARCH
+        searchBtn.addActionListener(e -> {
+            try {
+                model.setRowCount(0);
+
+                
+                String title = searchField.getText();
+
+                ResultSet rs = dao.searchByTitle(title, user.getRole());
+
+                while (rs.next()) {
+                    model.addRow(new Object[]{
+                            rs.getInt("id"),
+                            rs.getString("title"),
+                            rs.getString("category"),
+                            rs.getDouble("priority"),
+                            rs.getString("status"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at")
+                    });
+                }
+
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         });

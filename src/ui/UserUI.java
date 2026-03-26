@@ -1,144 +1,160 @@
 package ui;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import dao.ComplaintDAO;
 import model.Complaint;
-import java.sql.*;
 
-public class UserUI {
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.sql.ResultSet;
 
-    public UserUI(model.User user) {
+public class UserUI extends JFrame {
 
-        JFrame frame = new JFrame("User Panel");
-        frame.setSize(500, 520);
-        frame.setLayout(null);
- 
-        JLabel titleLabel = new JLabel("Title");
-        titleLabel.setBounds(20, 20, 100, 25);
-        frame.add(titleLabel);
+    JTextField titleField;
+    JTextArea descArea;
+    JComboBox<String> categoryBox;
+    JComboBox<String> severityBox, urgencyBox, impactBox;
 
-        JTextField titleField = new JTextField();
-        titleField.setBounds(150, 20, 250, 25);
-        frame.add(titleField);
+    JTable table;
+    DefaultTableModel tableModel;
 
-        JLabel descLabel = new JLabel("Description");
-        descLabel.setBounds(20, 60, 100, 25);
-        frame.add(descLabel);
+    public UserUI() {
 
-        JTextArea descArea = new JTextArea();
-        descArea.setBounds(150, 60, 250, 60);
-        frame.add(descArea);
+        setTitle("User Panel");
+        setSize(1000, 500);
+        setLayout(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        JLabel catLabel = new JLabel("Category");
-        catLabel.setBounds(20, 140, 100, 25);
-        frame.add(catLabel);
+        // Title
+        JLabel t1 = new JLabel("Title");
+        t1.setBounds(20, 20, 100, 25);
+        add(t1);
 
-        String[] categories = {"IT", "Maintenance", "Service"};
-        JComboBox<String> categoryBox = new JComboBox<>(categories);
-        categoryBox.setBounds(150, 140, 250, 25);
-        frame.add(categoryBox);
+        titleField = new JTextField();
+        titleField.setBounds(120, 20, 200, 25);
+        add(titleField);
 
-        JLabel severityLabel = new JLabel("Severity (1-10)");
-        severityLabel.setBounds(20, 180, 120, 25);
-        frame.add(severityLabel);
+        // Description
+        JLabel t2 = new JLabel("Description");
+        t2.setBounds(20, 60, 100, 25);
+        add(t2);
 
-        JLabel urgencyLabel = new JLabel("Urgency (1-10)");
-        urgencyLabel.setBounds(20, 210, 120, 25);
-        frame.add(urgencyLabel);
+        descArea = new JTextArea();
+        descArea.setBounds(120, 60, 200, 80);
+        add(descArea);
 
-        JLabel impactLabel = new JLabel("Impact (1-10)");
-        impactLabel.setBounds(20, 240, 120, 25);
-        frame.add(impactLabel);
+        // Category
+        JLabel t3 = new JLabel("Category");
+        t3.setBounds(20, 150, 100, 25);
+        add(t3);
 
-        Integer[] range = {1,2,3,4,5,6,7,8,9,10};
+        categoryBox = new JComboBox<>(new String[]{"IT", "Maintenance", "Service"});
+        categoryBox.setBounds(120, 150, 200, 25);
+        add(categoryBox);
 
-        JComboBox<Integer> severityBox = new JComboBox<>(range);
-        severityBox.setBounds(150, 180, 80, 25);
-        frame.add(severityBox);
+        // Dropdown values
+        String[] values = {"1","2","3","4","5","6","7","8","9","10"};
 
-        JComboBox<Integer> urgencyBox = new JComboBox<>(range);
-        urgencyBox.setBounds(150, 210, 80, 25);
-        frame.add(urgencyBox);
+        JLabel s1 = new JLabel("Severity");
+        s1.setBounds(20, 190, 80, 25);
+        add(s1);
 
-        JComboBox<Integer> impactBox = new JComboBox<>(range);
-        impactBox.setBounds(150, 240, 80, 25);
-        frame.add(impactBox);
+        severityBox = new JComboBox<>(values);
+        severityBox.setBounds(100, 190, 80, 25);
+        add(severityBox);
 
-        JButton submitBtn = new JButton("Submit Complaint");
-        submitBtn.setBounds(150, 280, 180, 30);
-        frame.add(submitBtn);
+        JLabel s2 = new JLabel("Urgency");
+        s2.setBounds(190, 190, 80, 25);
+        add(s2);
 
-        JButton viewBtn = new JButton("View My Complaints");
-        viewBtn.setBounds(150, 320, 180, 30);
-        frame.add(viewBtn);
+        urgencyBox = new JComboBox<>(values);
+        urgencyBox.setBounds(260, 190, 80, 25);
+        add(urgencyBox);
 
-        String[] cols = {"ID","Title","Category","Priority","Status"};
-        DefaultTableModel tableModel = new DefaultTableModel(cols, 0);
-        JTable table = new JTable(tableModel);
+        JLabel s3 = new JLabel("Impact");
+        s3.setBounds(350, 190, 80, 25);
+        add(s3);
+
+        impactBox = new JComboBox<>(values);
+        impactBox.setBounds(410, 190, 80, 25);
+        add(impactBox);
+
+        // Buttons
+        JButton submitBtn = new JButton("Submit");
+        submitBtn.setBounds(120, 230, 100, 30);
+        add(submitBtn);
+
+        JButton viewBtn = new JButton("View Complaints");
+        viewBtn.setBounds(230, 230, 160, 30);
+        add(viewBtn);
+
+        // TABLE
+        String[] cols = {"ID","Title","Category","Priority","Status","Created At","Updated At"};
+        tableModel = new DefaultTableModel(cols, 0);
+        table = new JTable(tableModel);
+
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        table.getColumnModel().getColumn(0).setPreferredWidth(50);
+        table.getColumnModel().getColumn(1).setPreferredWidth(180);
+        table.getColumnModel().getColumn(2).setPreferredWidth(120);
+        table.getColumnModel().getColumn(3).setPreferredWidth(80);
+        table.getColumnModel().getColumn(4).setPreferredWidth(100);
+        table.getColumnModel().getColumn(5).setPreferredWidth(180);
+        table.getColumnModel().getColumn(6).setPreferredWidth(180);
 
         JScrollPane scroll = new JScrollPane(table);
-        scroll.setBounds(20, 360, 450, 120);
-        scroll.setVisible(false); 
-        frame.add(scroll);
+        scroll.setBounds(500, 20, 450, 400);
+        add(scroll);
 
+        // SUBMIT
         submitBtn.addActionListener(e -> {
 
-            String title = titleField.getText();
-            String desc = descArea.getText();
-            String category = (String) categoryBox.getSelectedItem();
-
-            int severity = (int) severityBox.getSelectedItem();
-            int urgency = (int) urgencyBox.getSelectedItem();
-            int impact = (int) impactBox.getSelectedItem();
-
-            double priority = (severity + urgency + impact) / 3.0;
-
             Complaint c = new Complaint();
-            c.setTitle(title);
-            c.setDescription(desc);
-            c.setCategory(category);
+
+            c.setTitle(titleField.getText());
+            c.setDescription(descArea.getText());
+            c.setCategory(categoryBox.getSelectedItem().toString());
+
+            int severity = Integer.parseInt(severityBox.getSelectedItem().toString());
+            int urgency = Integer.parseInt(urgencyBox.getSelectedItem().toString());
+            int impact = Integer.parseInt(impactBox.getSelectedItem().toString());
+
             c.setSeverity(severity);
             c.setUrgency(urgency);
             c.setImpact(impact);
+
+            double priority = (severity * 0.5) + (urgency * 0.3) + (impact * 0.2);
             c.setPriority(priority);
 
-            ComplaintDAO dao = new ComplaintDAO();
-            dao.insertComplaint(c);
+            new ComplaintDAO().insertComplaint(c);
 
-            JOptionPane.showMessageDialog(frame, "Complaint Submitted!");
-
-        
-            titleField.setText("");
-            descArea.setText("");
-
-            scroll.setVisible(false);
+            JOptionPane.showMessageDialog(null, "Complaint Submitted!");
         });
 
-        
+        // VIEW
         viewBtn.addActionListener(e -> {
-
-            scroll.setVisible(true); 
-            tableModel.setRowCount(0);
-
-            ComplaintDAO dao = new ComplaintDAO();
-            ResultSet rs = dao.getComplaintsByUser();
-
             try {
-                while(rs.next()){
+                ResultSet rs = new ComplaintDAO().getComplaintsByUser();
+
+                tableModel.setRowCount(0);
+
+                while (rs.next()) {
                     tableModel.addRow(new Object[]{
                             rs.getInt("id"),
                             rs.getString("title"),
                             rs.getString("category"),
                             rs.getDouble("priority"),
-                            rs.getString("status")
+                            rs.getString("status"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at")
                     });
                 }
-            } catch(Exception ex){
+
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         });
 
-        frame.setVisible(true);
+        setVisible(true);
     }
 }

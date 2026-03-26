@@ -1,72 +1,78 @@
 package ui;
 
-import javax.swing.*;
 import dao.UserDAO;
 import model.User;
 
-public class LoginUI {
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-    public static void main(String[] args) {
+public class LoginUI extends JFrame {
 
-        JFrame frame = new JFrame("Login");
-        frame.setSize(300, 200);
-        frame.setLayout(null);
+    JTextField usernameField;
+    JPasswordField passwordField;
 
-        JTextField userField = new JTextField();
-        userField.setBounds(80, 30, 150, 25);
+    public LoginUI() {
 
-        JPasswordField passField = new JPasswordField();
-        passField.setBounds(80, 70, 150, 25);
+        setTitle("Login");
+        setSize(300, 200);
+        setLayout(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+        JLabel userLabel = new JLabel("Username");
+        userLabel.setBounds(20, 20, 80, 25);
+        add(userLabel);
+
+        usernameField = new JTextField();
+        usernameField.setBounds(100, 20, 150, 25);
+        add(usernameField);
+
+        JLabel passLabel = new JLabel("Password");
+        passLabel.setBounds(20, 60, 80, 25);
+        add(passLabel);
+
+        passwordField = new JPasswordField();
+        passwordField.setBounds(100, 60, 150, 25);
+        add(passwordField);
 
         JButton loginBtn = new JButton("Login");
-        loginBtn.setBounds(100, 110, 100, 30);
+        loginBtn.setBounds(100, 100, 100, 30);
+        add(loginBtn);
 
-        frame.add(new JLabel("User")).setBounds(20,30,60,25);
-        frame.add(userField);
-        frame.add(new JLabel("Pass")).setBounds(20,70,60,25);
-        frame.add(passField);
-        frame.add(loginBtn);
+        loginBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
 
-        loginBtn.addActionListener(e -> {
+                String username = usernameField.getText();
+                String password = new String(passwordField.getPassword());
 
-            String username = userField.getText();
-            String password = new String(passField.getPassword());
+                UserDAO dao = new UserDAO();
+                User user = dao.login(username, password);
 
-            UserDAO dao = new UserDAO();
-            User user = dao.login(username, password);
+                if (user != null) {
 
-            if(user == null){
-                JOptionPane.showMessageDialog(frame,"Invalid login");
-            } else {
+                    JOptionPane.showMessageDialog(null, "Login Successful!");
 
-                frame.dispose();
-
-                String role = user.getRole().trim().toUpperCase();
-
-           
-                System.out.println("Role: " + role);
-
-                switch(role) {
-                    case "ADMIN":
+                    // Use role
+                    if (user.getRole().equals("ADMIN")) {
                         new AdminUI();
-                        break;
-
-                    case "USER":
-                        new UserUI(user);
-                        break;
-
-                    case "IT":
-                    case "MAINTENANCE":
-                    case "SERVICE":
+                    } else if (user.getRole().equals("USER")) {
+                        new UserUI();
+                    } else {
                         new TeamUI(user);
-                        break;
+                    }
 
-                    default:
-                        JOptionPane.showMessageDialog(null, "Unknown role: " + role);
+                    dispose();
+
+                } else {
+                    JOptionPane.showMessageDialog(null, "Invalid Credentials");
                 }
             }
         });
 
-        frame.setVisible(true);
+        setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        new LoginUI();
     }
 }
