@@ -315,10 +315,10 @@ This project demonstrates how **Design and Analysis of Algorithms** can be appli
 
 ## 👨‍💻 Author
 
-**Shubham Kumar**
-**Parikshit Singh**
-**avni negi**
-**jahnvi sharma**
+* **Shubham Kumar**
+* **Parikshit Singh**
+* **avni negi**
+* **jahnvi sharma**
 
 ---
 
