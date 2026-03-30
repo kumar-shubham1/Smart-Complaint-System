@@ -9,7 +9,7 @@ public class AdminUI {
     public AdminUI() {
 
         JFrame frame = new JFrame("Admin Panel");
-        frame.setSize(400, 350);
+        frame.setSize(400, 350); // increased height
         frame.setLayout(null);
 
         // 🔹 Process Button (Greedy + BFS)
@@ -17,7 +17,7 @@ public class AdminUI {
         processBtn.setBounds(100, 60, 200, 40);
         frame.add(processBtn);
 
-        // 🔹 View Sorted (Greedy Visible)
+        // 🔹 View Priority Order (Greedy Visualization)
         JButton viewSorted = new JButton("View Priority Order");
         viewSorted.setBounds(100, 120, 200, 40);
         frame.add(viewSorted);
