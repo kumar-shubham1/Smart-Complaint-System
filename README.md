@@ -11,6 +11,7 @@ It enables:
 * 🤖 Auto-classification
 * 🔗 Related complaint detection
 * 🧠 Efficient processing using algorithms
+* 📊 **Explainable priority system (NEW ⭐)**
 
 ---
 
@@ -21,6 +22,7 @@ To build a **real-world scalable system** that:
 * Reduces manual effort in complaint handling
 * Optimizes complaint processing using **DAA techniques**
 * Demonstrates practical use of algorithms in software systems
+* Provides **transparent & explainable decision-making**
 
 ---
 
@@ -36,18 +38,19 @@ To build a **real-world scalable system** that:
 
 ---
 
-## 🔥 Key Features
+## 🔥 Key Features (UPDATED)
 
 ### ✅ 1. Smart Priority Scheduling (Greedy)
 
 * Complaints are processed based on priority
-* Priority = Severity + Urgency + Impact
+* Highest priority handled first
+* Admin can view **priority order list**
 
 ---
 
-### 🤖 2. Auto Category Detection
+### 🤖 2. Auto Category Detection (String Matching)
 
-* System detects category from description
+* System detects category from description automatically
 * Example:
 
   * “server down” → IT
@@ -57,23 +60,50 @@ To build a **real-world scalable system** that:
 
 ### 🔗 3. Related Complaint Detection (Graph + BFS)
 
-* Finds similar complaints
-* Helps detect duplicates
+* Detects similar complaints
+* Helps reduce duplication
+* Shows related complaint IDs in Admin panel
 
 ---
 
-### ⚡ 4. Fast Search (Binary + Hashing)
+### 📊 4. Explainable Priority System (NEW ⭐)
 
-* Instant lookup by ID
+* Shows **why a complaint is prioritized**
+* Example output:
+
+```
+Severity (9) × 0.5
+Urgency (8) × 0.3
+Impact (7) × 0.2
+
+Final Priority = 8.2
+```
+
+👉 Makes system **transparent & user-friendly**
+
+---
+
+### ⚡ 5. Fast Search (Binary + Hashing)
+
+* Instant lookup using HashMap
 * Optimized searching
 
 ---
 
-### 📊 5. Role-Based Panels
+### 📊 6. Admin Intelligence Panel (UPDATED)
+
+* Process complaints (Greedy)
+* View related complaints (BFS)
+* View full priority order list
+* See **priority explanation**
+
+---
+
+### 👥 7. Role-Based System
 
 * 👤 User → Submit complaints
 * 🧑‍💼 Team → Manage complaints
-* 🛠️ Admin → Process complaints
+* 🛠️ Admin → Smart processing
 
 ---
 
@@ -84,9 +114,24 @@ UI Layer (Swing)
    ↓
 Service Layer (DAA Logic)
    ↓
-DAO Layer (Database)
+DAO Layer (Database + DAA Integration)
    ↓
 MySQL Database
+```
+
+---
+
+## 🔄 Data Flow (NEW)
+
+```
+User submits complaint
+   ↓
+Stored in Database (DAO)
+   ↓
+Also added to:
+   → Priority Queue (Greedy)
+   → Graph (BFS)
+   → HashMap (Fast Access)
 ```
 
 ---
@@ -96,7 +141,7 @@ MySQL Database
 ```
 src/
  ├── dao/
- │   ├── ComplaintDAO.java
+ │   ├── ComplaintDAO.java   ← DB + Service Integration ⭐
  │   ├── UserDAO.java
  │   └── DBConnection.java
  │
@@ -105,13 +150,13 @@ src/
  │   └── User.java
  │
  ├── service/
- │   └── ComplaintService.java
+ │   └── ComplaintService.java ← ALL DAA LOGIC ⭐
  │
  ├── ui/
  │   ├── LoginUI.java
- │   ├── UserUI.java
+ │   ├── UserUI.java   ← Auto Category Detection ⭐
  │   ├── TeamUI.java
- │   └── AdminUI.java
+ │   └── AdminUI.java  ← Greedy + BFS + Explainable ⭐
  │
  └── util/
      └── AppContext.java
@@ -128,19 +173,17 @@ src/
 
 ---
 
-## 🛠️ How to Run (Step-by-Step)
+## 🛠️ How to Run
 
 ### 1️⃣ Install Requirements
 
-* Java JDK (17+ recommended)
+* Java JDK (17+)
 * MySQL Server
 * VS Code / IntelliJ
 
 ---
 
 ### 2️⃣ Setup Database
-
-Open MySQL and run:
 
 ```sql
 CREATE DATABASE complaint_system;
@@ -188,14 +231,6 @@ Edit:
 src/dao/DBConnection.java
 ```
 
-```java
-DriverManager.getConnection(
-    "jdbc:mysql://localhost:3306/complaint_system",
-    "root",
-    "your_password"
-);
-```
-
 ---
 
 ### 5️⃣ Run Project
@@ -224,16 +259,17 @@ LoginUI.java
 
 1. Login
 2. Submit complaint
-3. System calculates priority
-4. Auto category detection
+3. Auto category detection
+4. Priority calculated
 
 ---
 
-### 🛠️ Admin Flow
+### 🛠️ Admin Flow (UPDATED ⭐)
 
-1. Click "Process Complaint"
-2. Highest priority complaint selected (Greedy)
-3. Assigned to team
+1. Click **Process Complaint**
+2. Highest priority selected (Greedy)
+3. Related complaints shown (BFS)
+4. Priority explanation displayed
 
 ---
 
@@ -245,25 +281,13 @@ LoginUI.java
 
 ---
 
-## 📊 Example
+## 🌟 Unique Points (MENTOR CATCHY 🔥)
 
-```
-Severity = 9
-Urgency = 8
-Impact = 7
-
-Priority = 8.2
-→ Processed first
-```
-
----
-
-## 🌟 Unique Points (Mentor Catchy)
-
-* Real-world use of **DAA in software system**
-* Intelligent complaint handling
-* Graph-based relationship detection
-* Explainable priority system
+* Real-world use of **DAA algorithms**
+* Graph-based complaint linking
+* Intelligent auto classification
+* ⚡ **Explainable priority system (RARE FEATURE)**
+* UI + Algorithm integration
 * Scalable architecture
 
 ---
@@ -271,35 +295,18 @@ Priority = 8.2
 ## 📈 Future Enhancements
 
 * 📱 Web / Mobile version
-* 🤖 AI-based NLP classification
+* 🤖 NLP-based classification
 * 📊 Analytics dashboard
 * ☁️ Cloud deployment
-
----
-
-## 🚀 Deployment Guide (Basic)
-
-### Option 1: Local Deployment
-
-* Run using IDE
-* Connect to local MySQL
-
----
-
-### Option 2: Cloud (Advanced)
-
-* Backend → Spring Boot (optional upgrade)
-* DB → MySQL (AWS RDS)
-* Hosting → Render / Railway
 
 ---
 
 ## 🧠 Learning Outcomes
 
 * Practical use of **DAA concepts**
-* System design using layered architecture
-* Database integration
-* Real-world problem solving
+* Algorithm integration in real systems
+* Layered architecture design
+* Problem-solving using optimization techniques
 
 ---
 
@@ -309,22 +316,21 @@ This project demonstrates how **Design and Analysis of Algorithms** can be appli
 
 * Efficient
 * Scalable
-* Intelligent systems
+* Intelligent
+* Explainable systems
 
 ---
 
-## 👨‍💻 Author
+## 👨‍💻 Authors
 
 * **Shubham Kumar**
 * **Parikshit Singh**
-* **avni negi**
-* **jahnvi sharma**
+* **Avni Negi**
+* **Jahnvi Sharma**
 
 ---
 
 ## ⭐ If you like this project
 
 Give it a ⭐ on GitHub!
-
----
 
