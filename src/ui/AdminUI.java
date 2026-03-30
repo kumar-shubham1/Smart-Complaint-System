@@ -9,20 +9,20 @@ public class AdminUI {
     public AdminUI() {
 
         JFrame frame = new JFrame("Admin Panel");
-        frame.setSize(400, 350); // increased height
+        frame.setSize(400, 380); // slightly increased height
         frame.setLayout(null);
 
-        // 🔹 Process Button (Greedy + BFS)
+        // 🔹 Process Button (Greedy + BFS + Explainable AI)
         JButton processBtn = new JButton("Process Complaint");
-        processBtn.setBounds(100, 60, 200, 40);
+        processBtn.setBounds(100, 50, 200, 40);
         frame.add(processBtn);
 
         // 🔹 View Priority Order (Greedy Visualization)
         JButton viewSorted = new JButton("View Priority Order");
-        viewSorted.setBounds(100, 120, 200, 40);
+        viewSorted.setBounds(100, 110, 200, 40);
         frame.add(viewSorted);
 
-        // 🔥 PROCESS BUTTON LOGIC
+        // 🔥 PROCESS BUTTON LOGIC (UPDATED WITH EXPLANATION)
         processBtn.addActionListener(e -> {
 
             Complaint c = AppContext.service.processNext();
@@ -37,10 +37,19 @@ public class AdminUI {
                 java.util.List<Integer> related =
                         AppContext.service.getRelatedComplaints(c.getId());
 
+                // 🔥 NEW: EXPLAIN PRIORITY
+                String explanation =
+                        "Priority Breakdown:\n" +
+                        "Severity (" + c.getSeverity() + ") × 0.5\n" +
+                        "Urgency (" + c.getUrgency() + ") × 0.3\n" +
+                        "Impact (" + c.getImpact() + ") × 0.2\n\n" +
+                        "Final Priority = " + c.getPriority();
+
                 JOptionPane.showMessageDialog(frame,
                         "Complaint ID: " + c.getId() +
                         "\nAssigned to: " + team +
-                        "\nRelated Complaints: " + related
+                        "\nRelated Complaints: " + related +
+                        "\n\n" + explanation
                 );
             }
         });
