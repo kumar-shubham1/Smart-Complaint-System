@@ -1,0 +1,3 @@
+﻿adadmin	admin123	ADMIN
+it_team	team123	IT
+user1	user123	USER
