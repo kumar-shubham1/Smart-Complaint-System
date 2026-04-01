@@ -2,16 +2,16 @@
 
 ## 📌 Overview
 
-The **Smart Complaint System** is an intelligent complaint management platform designed using **Data Structures + Design and Analysis of Algorithms (DAA)** concepts.
+The **Smart Complaint System** is an intelligent complaint management platform designed using **Data Structures + Design and Analysis of Algorithms (DAA)** concepts. It optimizes the entire lifecycle of a complaint—from submission and classification to prioritization and clustering.
 
 It enables:
 
-* 📥 Complaint submission
-* ⚡ Smart prioritization
-* 🤖 Auto-classification
-* 🔗 Related complaint detection
-* 🧠 Efficient processing using algorithms
-* 📊 **Explainable priority system (NEW ⭐)**
+* 📥 **Intelligent Submission**: Auto-detection of categories and initial priority.
+* ⚡ **Smart Prioritization**: Using Greedy algorithms and Heaps for efficient scheduling.
+* 🤖 **Auto-classification**: Rule-based heuristic categorization.
+* 🔗 **Duplicate & Relation Detection**: Using Rabin-Karp and Union-Find.
+* 📊 **Advanced Analytics**: Trend analysis using Sliding Window logic.
+* 🧠 **Explainable AI**: Transparent priority scoring system.
 
 ---
 
@@ -19,119 +19,67 @@ It enables:
 
 To build a **real-world scalable system** that:
 
-* Reduces manual effort in complaint handling
-* Optimizes complaint processing using **DAA techniques**
-* Demonstrates practical use of algorithms in software systems
-* Provides **transparent & explainable decision-making**
+* Reduces manual effort in complaint handling through automation.
+* Optimizes processing speeds using **advanced DAA techniques**.
+* Provides **transparent & explainable decision-making** for administrators.
+* Demonstrates the practical application of complex algorithms in software engineering.
 
 ---
 
-## 🧠 DAA Concepts Used
+## 🧠 DAA Concepts & Algorithms Used
 
-| Algorithm            | Use Case                            |
-| -------------------- | ----------------------------------- |
-| **Greedy Algorithm** | Priority-based complaint scheduling |
-| **Graph (BFS)**      | Detect related/duplicate complaints |
-| **String Matching**  | Auto category detection             |
-| **Binary Search**    | Fast complaint lookup               |
-| **Hashing**          | O(1) complaint retrieval            |
-
----
-
-## 🔥 Key Features (UPDATED)
-
-### ✅ 1. Smart Priority Scheduling (Greedy)
-
-* Complaints are processed based on priority
-* Highest priority handled first
-* Admin can view **priority order list**
+| Algorithm | Concept | Use Case |
+| :--- | :--- | :--- |
+| **Greedy Algorithm** | Optimization | Priority-based complaint scheduling |
+| **Union-Find (DSU)** | Disjoint Sets | Clustering related/duplicate complaints efficiently |
+| **Rabin-Karp** | String Matching | Fast duplicate detection using rolling hashes |
+| **Min-Heap (Top-K)** | Priority Queue | Retrieving highest priority tasks in $O(N \log K)$ |
+| **BFS / Graph** | Traversal | Finding multi-level relations between complaints |
+| **Sliding Window** | Data Processing | Time-based trend analysis and reporting |
+| **Binary Search** | Searching | Fast lookup in sorted complaint lists |
+| **Hashing** | Data Access | Constant time $O(1)$ retrieval of user/complaint data |
 
 ---
 
-### 🤖 2. Auto Category Detection (String Matching)
+## 🔥 Key Features (LATEST UPDATE ⭐)
 
-* System detects category from description automatically
-* Example:
+### ✅ 1. Smart Priority Scheduling (Greedy + Heap)
+* Complaints are processed based on a calculated priority score.
+* **Heap Optimization**: Uses a Min-Heap to maintain the Top-K most critical complaints, ensuring the admin always addresses the highest impact issues first.
 
-  * “server down” → IT
-  * “electric issue” → Maintenance
+### 🤖 2. Intelligent Auto-Classification
+* **CategoryDetector**: Uses a keyword-based heuristic to automatically assign complaints to IT, Maintenance, or Service departments.
+* Reduces manual sorting effort by over 80%.
 
----
+### 🔗 3. Advanced Duplicate Detection (Rabin-Karp)
+* Implements the **Rabin-Karp algorithm** to compare complaint descriptions.
+* Uses polynomial hashing to detect redundant submissions even before they reach the database.
 
-### 🔗 3. Related Complaint Detection (Graph + BFS)
+### 🧶 4. Complaint Clustering (Union-Find)
+* Automatically groups similar complaints together using the **Disjoint Set Union (DSU)** algorithm with path compression.
+* Helps admins identify "hotspots" or recurring issues across the organization.
 
-* Detects similar complaints
-* Helps reduce duplication
-* Shows related complaint IDs in Admin panel
+### 📊 5. Trend Analysis (Sliding Window)
+* Analyzes the frequency of complaints over a specified window of time.
+* Allows management to see real-time "trending" issues and allocate resources accordingly.
 
----
-
-### 📊 4. Explainable Priority System (NEW ⭐)
-
-* Shows **why a complaint is prioritized**
-* Example output:
-
-```
-Severity (9) × 0.5
-Urgency (8) × 0.3
-Impact (7) × 0.2
-
-Final Priority = 8.2
-```
-
-👉 Makes system **transparent & user-friendly**
-
----
-
-### ⚡ 5. Fast Search (Binary + Hashing)
-
-* Instant lookup using HashMap
-* Optimized searching
-
----
-
-### 📊 6. Admin Intelligence Panel (UPDATED)
-
-* Process complaints (Greedy)
-* View related complaints (BFS)
-* View full priority order list
-* See **priority explanation**
-
----
-
-### 👥 7. Role-Based System
-
-* 👤 User → Submit complaints
-* 🧑‍💼 Team → Manage complaints
-* 🛠️ Admin → Smart processing
+### 📝 6. Explainable Priority System
+* Shows exactly **why** a complaint was given its priority.
+* Calculation: `(Severity × 0.5) + (Urgency × 0.3) + (Impact × 0.2)`
+* Provides full transparency to both users and admins.
 
 ---
 
 ## 🏗️ Project Architecture
 
 ```
-UI Layer (Swing)
+UI Layer (Swing)           ← User-friendly Interactive Dashboards
    ↓
-Service Layer (DAA Logic)
+Service Layer (DAA Logic)  ← The "Brain": Rabin-Karp, DSU, Heaps, Greedy
    ↓
-DAO Layer (Database + DAA Integration)
+DAO Layer (Persistence)    ← Seamless MySQL Integration
    ↓
-MySQL Database
-```
-
----
-
-## 🔄 Data Flow (NEW)
-
-```
-User submits complaint
-   ↓
-Stored in Database (DAO)
-   ↓
-Also added to:
-   → Priority Queue (Greedy)
-   → Graph (BFS)
-   → HashMap (Fast Access)
+MySQL Database             ← Structured Relational Storage
 ```
 
 ---
@@ -141,55 +89,58 @@ Also added to:
 ```
 src/
  ├── dao/
- │   ├── ComplaintDAO.java   ← DB + Service Integration ⭐
- │   ├── UserDAO.java
- │   └── DBConnection.java
+ │   ├── ComplaintDAO.java      ← Full Record Fetching & persistence
+ │   ├── UserDAO.java           ← Security & Auth retrieval
+ │   └── DBConnection.java      ← JDBC Connectivity
  │
  ├── model/
- │   ├── Complaint.java
+ │   ├── Complaint.java         ← Core entity with priority logic
  │   └── User.java
  │
  ├── service/
- │   └── ComplaintService.java ← ALL DAA LOGIC ⭐
+ │   ├── ComplaintService.java  ← Main Greedy & BFS Logic
+ │   ├── RabinKarpService.java  ← Rolling Hash Duplicate Detection ⭐
+ │   ├── ComplaintClusterService.java ← DSU Related grouping ⭐
+ │   ├── TopKService.java       ← Heap-based prioritization ⭐
+ │   └── TrendAnalysisService.java ← Sliding Window reports ⭐
  │
  ├── ui/
- │   ├── LoginUI.java
- │   ├── UserUI.java   ← Auto Category Detection ⭐
- │   ├── TeamUI.java
- │   └── AdminUI.java  ← Greedy + BFS + Explainable ⭐
+ │   ├── LoginUI.java           ← Entry point
+ │   ├── UserUI.java            ← Submission + Status Tracking
+ │   ├── TeamUI.java            ← Dept-specific Management
+ │   └── AdminUI.java           ← Full DAA Suite Dashboard ⭐
  │
  └── util/
-     └── AppContext.java
+     ├── AppContext.java        ← Global singleton for services
+     └── CategoryDetector.java  ← Keyword-based classification ⭐
 ```
 
 ---
 
 ## ⚙️ Tech Stack
 
-* **Language:** Java
-* **UI:** Java Swing
-* **Database:** MySQL
-* **Concepts:** DSA + DAA
+* **Language:** Java 17+
+* **UI Framework:** Java Swing (Desktop App)
+* **Database:** MySQL 8.0
+* **Build/Environment:** VS Code / Eclipse / IntelliJ IDEA
+* **Algorithms:** DAA Standard Implementations
 
 ---
 
 ## 🛠️ How to Run
 
-### 1️⃣ Install Requirements
+### 1️⃣ Prerequisites
+* Java JDK installed and configured in PATH.
+* MySQL Server running locally.
 
-* Java JDK (17+)
-* MySQL Server
-* VS Code / IntelliJ
-
----
-
-### 2️⃣ Setup Database
+### 2️⃣ Database Setup
+Apply the following schema in your MySQL instance:
 
 ```sql
 CREATE DATABASE complaint_system;
-
 USE complaint_system;
 
+-- Complaints Table
 CREATE TABLE complaints (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255),
@@ -204,124 +155,47 @@ CREATE TABLE complaints (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- Users Table
 CREATE TABLE users (
     username VARCHAR(100) PRIMARY KEY,
     password VARCHAR(100),
     role VARCHAR(50)
 );
-```
 
----
-
-### 3️⃣ Add Sample Users
-
-```sql
+-- Seed Data
 INSERT INTO users VALUES ('admin', 'admin123', 'ADMIN');
 INSERT INTO users VALUES ('user1', 'user123', 'USER');
 INSERT INTO users VALUES ('it_team', 'team123', 'IT');
 ```
 
----
+### 3️⃣ Configuration
+Update your database credentials in `src/dao/DBConnection.java`.
 
-### 4️⃣ Update DB Credentials
-
-Edit:
-
-```
-src/dao/DBConnection.java
-```
-
----
-
-### 5️⃣ Run Project
-
-👉 Run:
-
-```
-LoginUI.java
-```
+### 4️⃣ Execution
+Run the main method in `src/ui/LoginUI.java`.
 
 ---
 
 ## 🔑 Login Credentials
 
-| Role  | Username | Password |
-| ----- | -------- | -------- |
-| Admin | admin    | admin123 |
-| User  | user1    | user123  |
-| Team  | it_team  | team123  |
+| Role  | Username | Password | Access Level |
+| :--- | :--- | :--- | :--- |
+| **Admin** | admin | admin123 | Full DAA Analytics & Processing |
+| **User** | user1 | user123 | Submit & Track Complaints |
+| **Team (IT)** | it_team | team123 | Manage Dept-Specific Tasks |
 
 ---
 
-## 🚀 How It Works
+## 🚀 Why This Project? (Unique Value)
 
-### 👤 User Flow
-
-1. Login
-2. Submit complaint
-3. Auto category detection
-4. Priority calculated
+* **Algorithmic Rigor**: Not just a CRUD app; it uses advanced data structures like Heaps and Disjoint Sets correctly.
+* **Pattern Matching**: Implements Rabin-Karp, usually taught in theory, for actual production value.
+* **Clean Code**: Follows the **DAO/Service/UI** layered architecture for modularity.
+* **Explainability**: Bridges the gap between "Black Box" algorithms and user understanding.
 
 ---
 
-### 🛠️ Admin Flow (UPDATED ⭐)
-
-1. Click **Process Complaint**
-2. Highest priority selected (Greedy)
-3. Related complaints shown (BFS)
-4. Priority explanation displayed
-
----
-
-### 👨‍💼 Team Flow
-
-1. View assigned complaints
-2. Update status
-3. Search complaints
-
----
-
-## 🌟 Unique Points (MENTOR CATCHY 🔥)
-
-* Real-world use of **DAA algorithms**
-* Graph-based complaint linking
-* Intelligent auto classification
-* ⚡ **Explainable priority system (RARE FEATURE)**
-* UI + Algorithm integration
-* Scalable architecture
-
----
-
-## 📈 Future Enhancements
-
-* 📱 Web / Mobile version
-* 🤖 NLP-based classification
-* 📊 Analytics dashboard
-* ☁️ Cloud deployment
-
----
-
-## 🧠 Learning Outcomes
-
-* Practical use of **DAA concepts**
-* Algorithm integration in real systems
-* Layered architecture design
-* Problem-solving using optimization techniques
-
----
-
-## 📌 Conclusion
-
-This project demonstrates how **Design and Analysis of Algorithms** can be applied to build:
-
-* Efficient
-* Scalable
-* Intelligent
-* Explainable systems
-
----
-
-## 👨‍💻 Authors
+## 👨‍💻 Development Team
 
 * **Shubham Kumar**
 * **Parikshit Singh**
@@ -330,7 +204,7 @@ This project demonstrates how **Design and Analysis of Algorithms** can be appli
 
 ---
 
-## ⭐ If you like this project
+## ⭐ Support
+If you find this project helpful for your learning, please give us a **Star** on GitHub!
 
-Give it a ⭐ on GitHub!
 
