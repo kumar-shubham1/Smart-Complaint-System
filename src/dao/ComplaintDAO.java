@@ -141,17 +141,36 @@ public class ComplaintDAO {
         return null;
     }
 
-    // 🔥 FETCH ALL COLUMNS (NEW)
-    public ResultSet getAllComplaintsFull() {
-        try {
-            Connection conn = DBConnection.getConnection();
-            String sql = "SELECT * FROM complaints ORDER BY priority DESC";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            return ps.executeQuery();
+    // 🔥 FETCH ALL (SAFE & ROBUST)
+    public java.util.List<Complaint> getAllComplaints() {
+        java.util.List<Complaint> list = new java.util.ArrayList<>();
+        String sql = "SELECT * FROM complaints ORDER BY priority DESC";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            if (conn == null) return list;
+
+            while (rs.next()) {
+                Complaint c = new Complaint();
+                c.setId(rs.getInt("id"));
+                c.setTitle(rs.getString("title"));
+                c.setDescription(rs.getString("description"));
+                c.setCategory(rs.getString("category"));
+                c.setSeverity(rs.getInt("severity"));
+                c.setUrgency(rs.getInt("urgency"));
+                c.setImpact(rs.getInt("impact"));
+                c.setPriority(rs.getDouble("priority"));
+                c.setStatus(rs.getString("status"));
+                c.setCreatedAt(rs.getTimestamp("created_at"));
+                c.setUpdatedAt(rs.getTimestamp("updated_at"));
+                list.add(c);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return list;
     }
 }
 

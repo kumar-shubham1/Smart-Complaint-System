@@ -116,36 +116,22 @@ public class ComplaintService {
         return null;
     }
 
-    // 🔥 DB INTEGRATION METHOD (UPDATED)
-    public List<Complaint> loadComplaintsFromDB() {
-        List<Complaint> list = new ArrayList<>();
-        try {
-            java.sql.ResultSet rs = new dao.ComplaintDAO().getAllComplaintsFull();
-
-            while (rs != null && rs.next()) {
-                Complaint c = new Complaint();
-
-                c.setId(rs.getInt("id"));
-                c.setTitle(rs.getString("title"));
-                c.setDescription(rs.getString("description"));
-                c.setCategory(rs.getString("category"));
-
-                c.setSeverity(rs.getInt("severity"));
-                c.setUrgency(rs.getInt("urgency"));
-                c.setImpact(rs.getInt("impact"));
-
-                c.setPriority(rs.getDouble("priority"));
-                c.setStatus(rs.getString("status"));
-
-                c.setCreatedAt(rs.getTimestamp("created_at"));
-                c.setUpdatedAt(rs.getTimestamp("updated_at"));
-
-                list.add(c);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    // 🔥 DB SYNC (LOAD ALL FROM DB TO Queue, Map, Graph)
+    public void syncWithDB() {
+        queue.clear();
+        map.clear();
+        graph.clear();
+        
+        List<Complaint> list = loadComplaintsFromDB();
+        for (Complaint c : list) {
+            addComplaint(c); // This populates queue, map, and graph
         }
-        return list;
+    }
+
+    // 🔥 DB INTEGRATION METHOD (FETCH LIST)
+    public List<Complaint> loadComplaintsFromDB() {
+        // Redirection to the robust DAO method
+        return util.AppContext.dao.getAllComplaints();
     }
 }
 

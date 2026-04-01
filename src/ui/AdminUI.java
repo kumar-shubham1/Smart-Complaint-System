@@ -70,6 +70,8 @@ public class AdminUI {
 
         // 🔥 PROCESS BUTTON LOGIC (UPDATED WITH EXPLANATION)
         processBtn.addActionListener(e -> {
+            // 🔥 SYNC FROM DB
+            AppContext.service.syncWithDB();
 
             Complaint c = AppContext.service.processNext();
 
@@ -78,6 +80,9 @@ public class AdminUI {
             } else {
 
                 String team = AppContext.service.assignTeam(c);
+                
+                // 🔥 PERSIST STATUS CHANGE TO DB
+                AppContext.dao.updateStatus(c.getId(), "ASSIGNED");
 
                 // 🔥 BFS RELATED COMPLAINTS
                 java.util.List<Integer> related =
@@ -102,6 +107,8 @@ public class AdminUI {
 
         // 🔥 GREEDY SORT DISPLAY
         viewSorted.addActionListener(e -> {
+            // 🔥 LOAD DATA FIRST
+            AppContext.service.syncWithDB();
 
             java.util.List<Complaint> list =
                     AppContext.service.getSortedComplaints();

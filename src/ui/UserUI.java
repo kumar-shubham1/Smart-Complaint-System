@@ -123,6 +123,9 @@ public class UserUI extends JFrame {
 
             JOptionPane.showMessageDialog(null,
                     "Complaint Submitted!\nDetected Category: " + detectedCategory);
+
+            // 🔹 Refresh Table Automatically
+            viewBtn.doClick();
         });
 
         // VIEW
