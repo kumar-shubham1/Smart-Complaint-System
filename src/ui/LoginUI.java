@@ -52,6 +52,9 @@ public class LoginUI extends JFrame {
 
                     JOptionPane.showMessageDialog(null, "Login Successful!");
 
+                    // 🔥 INITIALIZE SYSTEM (SYNC DB TO DAA)
+                    util.AppContext.service.initializeSystem();
+
                     // Use role
                     if (user.getRole().equals("ADMIN")) {
                         new AdminUI();

@@ -1,6 +1,7 @@
 package service;
 
 import model.Complaint;
+import util.AppContext;
 import java.util.*;
 
 public class ComplaintService {
@@ -13,69 +14,76 @@ public class ComplaintService {
     private Map<Integer, List<Integer>> graph;
 
     public ComplaintService() {
-        queue = new PriorityQueue<>(
-                (c1, c2) -> Double.compare(c2.getPriority(), c1.getPriority())
-        );
-
-        map = new HashMap<>();
+        // Greedy: Max-Heap based on priority
+        queue = new PriorityQueue<>((c1, c2) -> Double.compare(c2.getPriority(), c1.getPriority()));
+        map = new HashMap<>(); // Hashing: O(1) Lookup
+        graph = new HashMap<>(); // Graph: Adjacency List for BFS
         teamMap = new HashMap<>();
-        graph = new HashMap<>();
-
+        
         teamMap.put("IT", "IT Team");
         teamMap.put("Maintenance", "Maintenance Team");
         teamMap.put("Service", "Service Team");
     }
 
-    // ADD COMPLAINT + GRAPH BUILD
-    public void addComplaint(Complaint c) {
+    /**
+     * 🔥 DAA CENTRAL COMMAND: Rebuilds initial state from DB.
+     */
+    public void initializeSystem() {
+        queue.clear();
+        map.clear();
+        graph.clear();
+        
+        List<Complaint> list = loadComplaintsFromDB();
+        for (Complaint c : list) {
+            addComplaintToMemory(c);
+        }
+    }
+
+    private void addComplaintToMemory(Complaint c) {
+        if (c == null) return;
         queue.add(c);
         map.put(c.getId(), c);
 
+        // Build Graph relationship: Connect complaints in same category (O(N) per add)
         graph.putIfAbsent(c.getId(), new ArrayList<>());
-
         for (Complaint other : map.values()) {
-            if (other.getId() != c.getId() &&
-                    other.getCategory().equals(c.getCategory())) {
-
+            if (other.getId() != c.getId() && 
+                other.getCategory() != null && 
+                other.getCategory().equalsIgnoreCase(c.getCategory())) {
+                
                 graph.get(c.getId()).add(other.getId());
                 graph.get(other.getId()).add(c.getId());
             }
         }
     }
 
-    // GREEDY
+    // Called by DAO after successful SQL Insert
+    public void addComplaint(Complaint c) {
+        addComplaintToMemory(c);
+    }
+
+    /**
+     * 🔥 GREEDY Processing: Pops highest priority from Queue
+     */
     public Complaint processNext() {
-        Complaint c = queue.poll();
-        if (c != null) {
-            c.setStatus("ASSIGNED");
-        }
-        return c;
+        return queue.poll();
     }
 
-    public String assignTeam(Complaint c) {
-        return teamMap.get(c.getCategory());
-    }
-
-    public Complaint searchById(int id) {
-        return map.get(id);
-    }
-
-    public Collection<Complaint> getAllComplaints() {
-        return map.values();
-    }
-
-    // GREEDY SORT (VISIBLE FEATURE)
     public List<Complaint> getSortedComplaints() {
         List<Complaint> list = new ArrayList<>(map.values());
         list.sort((a, b) -> Double.compare(b.getPriority(), a.getPriority()));
         return list;
     }
 
-    // BFS (GRAPH)
+    /**
+     * 🔥 BFS: Traverses the graph of related complaints
+     */
     public List<Integer> getRelatedComplaints(int id) {
         List<Integer> result = new ArrayList<>();
         Set<Integer> visited = new HashSet<>();
         Queue<Integer> q = new LinkedList<>();
+
+        if (!graph.containsKey(id)) return result;
 
         q.add(id);
         visited.add(id);
@@ -83,7 +91,6 @@ public class ComplaintService {
         while (!q.isEmpty()) {
             int curr = q.poll();
             result.add(curr);
-
             for (int nei : graph.getOrDefault(curr, new ArrayList<>())) {
                 if (!visited.contains(nei)) {
                     visited.add(nei);
@@ -91,48 +98,31 @@ public class ComplaintService {
                 }
             }
         }
-
         return result;
     }
 
-    // BINARY SEARCH
-    public Complaint binarySearchByPriority(List<Complaint> list, double target) {
-
+    /**
+     * 🔥 BINARY SEARCH: Specifically finds a priority target in a sorted list
+     */
+    public Complaint findByPriority(double target) {
+        List<Complaint> list = getSortedComplaints(); // Binary Search NEEDS a sorted list
         int low = 0, high = list.size() - 1;
-
         while (low <= high) {
             int mid = (low + high) / 2;
-
-            if (list.get(mid).getPriority() == target)
-                return list.get(mid);
-
-            else if (list.get(mid).getPriority() < target)
-                high = mid - 1;
-
-            else
-                low = mid + 1;
+            double midVal = list.get(mid).getPriority();
+            if (Math.abs(midVal - target) < 0.01) return list.get(mid);
+            if (midVal < target) high = mid - 1;
+            else low = mid + 1;
         }
-
         return null;
     }
 
-    // 🔥 DB SYNC (LOAD ALL FROM DB TO Queue, Map, Graph)
-    public void syncWithDB() {
-        queue.clear();
-        map.clear();
-        graph.clear();
-        
-        List<Complaint> list = loadComplaintsFromDB();
-        for (Complaint c : list) {
-            addComplaint(c); // This populates queue, map, and graph
-        }
+    public String assignTeam(Complaint c) {
+        return teamMap.getOrDefault(c.getCategory(), "General Team");
     }
 
-    // 🔥 DB INTEGRATION METHOD (FETCH LIST)
     public List<Complaint> loadComplaintsFromDB() {
-        // Redirection to the robust DAO method
+        // Safe access to optimized DAO loader
         return util.AppContext.dao.getAllComplaints();
     }
 }
-
-

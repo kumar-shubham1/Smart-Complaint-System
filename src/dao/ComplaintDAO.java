@@ -145,12 +145,13 @@ public class ComplaintDAO {
     public java.util.List<Complaint> getAllComplaints() {
         java.util.List<Complaint> list = new java.util.ArrayList<>();
         String sql = "SELECT * FROM complaints ORDER BY priority DESC";
-        
+
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            
-            if (conn == null) return list;
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
+            if (conn == null)
+                return list;
 
             while (rs.next()) {
                 Complaint c = new Complaint();
@@ -173,4 +174,3 @@ public class ComplaintDAO {
         return list;
     }
 }
-

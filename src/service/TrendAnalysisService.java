@@ -8,9 +8,7 @@ public class TrendAnalysisService {
 
     /**
      * Filters complaints created within the last N days (Sliding Window logic).
-     * @param complaints The collection of all complaints.
-     * @param days The sliding window size in days.
-     * @return List of complaints within the date range.
+     * Robust to null timestamps and handles window size accurately.
      */
     public List<Complaint> getComplaintsLastNDays(Collection<Complaint> complaints, int days) {
         if (complaints == null || days <= 0) return new ArrayList<>();
