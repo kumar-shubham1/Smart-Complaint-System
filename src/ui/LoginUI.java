@@ -2,46 +2,53 @@ package ui;
 
 import dao.UserDAO;
 import model.User;
-
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class LoginUI extends JFrame {
 
-    JTextField usernameField;
-    JPasswordField passwordField;
+    private JTextField usernameField;
+    private JPasswordField passwordField;
 
     public LoginUI() {
-
-        setTitle("Login");
-        setSize(300, 200);
-        setLayout(null);
+        setTitle("Complaint System - Login");
+        setSize(400, 300);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null); // Center window
 
-        JLabel userLabel = new JLabel("Username");
-        userLabel.setBounds(20, 20, 80, 25);
-        add(userLabel);
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        usernameField = new JTextField();
-        usernameField.setBounds(100, 20, 150, 25);
-        add(usernameField);
+        JLabel titleLabel = new JLabel("Login", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        panel.add(titleLabel, gbc);
 
-        JLabel passLabel = new JLabel("Password");
-        passLabel.setBounds(20, 60, 80, 25);
-        add(passLabel);
+        gbc.gridwidth = 1; gbc.gridy = 1;
+        panel.add(new JLabel("Username:"), gbc);
+        usernameField = new JTextField(15);
+        gbc.gridx = 1;
+        panel.add(usernameField, gbc);
 
-        passwordField = new JPasswordField();
-        passwordField.setBounds(100, 60, 150, 25);
-        add(passwordField);
+        gbc.gridx = 0; gbc.gridy = 2;
+        panel.add(new JLabel("Password:"), gbc);
+        passwordField = new JPasswordField(15);
+        gbc.gridx = 1;
+        panel.add(passwordField, gbc);
 
         JButton loginBtn = new JButton("Login");
-        loginBtn.setBounds(100, 100, 100, 30);
-        add(loginBtn);
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2;
+        panel.add(loginBtn, gbc);
+
+        add(panel);
 
         loginBtn.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-
                 String username = usernameField.getText();
                 String password = new String(passwordField.getPassword());
 
@@ -49,25 +56,31 @@ public class LoginUI extends JFrame {
                 User user = dao.login(username, password);
 
                 if (user != null) {
-
                     JOptionPane.showMessageDialog(null, "Login Successful!");
 
-                    // 🔥 INITIALIZE SYSTEM (SYNC DB TO DAA)
-                    util.AppContext.service.initializeSystem();
-
-                    // Use role
-                    if (user.getRole().equals("ADMIN")) {
-                        new AdminUI();
-                    } else if (user.getRole().equals("USER")) {
-                        new UserUI();
-                    } else {
-                        new TeamUI(user);
-                    }
-
-                    dispose();
-
+                    // 🔥 INITIALIZE SYSTEM (Run in background to avoid lag)
+                    loginBtn.setText("Loading...");
+                    loginBtn.setEnabled(false);
+                    
+                    new Thread(() -> {
+                        try {
+                            util.AppContext.service.initializeSystem();
+                            
+                            // Switch to UI thread for opening windows
+                            SwingUtilities.invokeLater(() -> {
+                                if (user.getRole().equalsIgnoreCase("ADMIN")) {
+                                    new AdminUI();
+                                } else {
+                                    new UserUI(user);
+                                }
+                                dispose(); 
+                            });
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }).start();
                 } else {
-                    JOptionPane.showMessageDialog(null, "Invalid Credentials");
+                    JOptionPane.showMessageDialog(null, "Invalid Credentials", "Failure", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -76,6 +89,10 @@ public class LoginUI extends JFrame {
     }
 
     public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ignored) {}
+        
         new LoginUI();
     }
 }

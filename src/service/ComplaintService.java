@@ -12,12 +12,14 @@ public class ComplaintService {
 
     // GRAPH for related complaints
     private Map<Integer, List<Integer>> graph;
+    private Map<String, List<Integer>> categoryGroups; // Optimization: Group by category for O(N) link building
 
     public ComplaintService() {
         // Greedy: Max-Heap based on priority
         queue = new PriorityQueue<>((c1, c2) -> Double.compare(c2.getPriority(), c1.getPriority()));
         map = new HashMap<>(); // Hashing: O(1) Lookup
         graph = new HashMap<>(); // Graph: Adjacency List for BFS
+        categoryGroups = new HashMap<>();
         teamMap = new HashMap<>();
         
         teamMap.put("IT", "IT Team");
@@ -29,14 +31,18 @@ public class ComplaintService {
      * 🔥 DAA CENTRAL COMMAND: Rebuilds initial state from DB.
      */
     public void initializeSystem() {
+        System.out.println("Processing System Optimization...");
         queue.clear();
         map.clear();
         graph.clear();
+        categoryGroups.clear();
         
         List<Complaint> list = loadComplaintsFromDB();
+        System.out.println("Loaded " + list.size() + " complaints. Building graph...");
         for (Complaint c : list) {
             addComplaintToMemory(c);
         }
+        System.out.println("✅ Optimization Complete.");
     }
 
     private void addComplaintToMemory(Complaint c) {
@@ -44,17 +50,21 @@ public class ComplaintService {
         queue.add(c);
         map.put(c.getId(), c);
 
-        // Build Graph relationship: Connect complaints in same category (O(N) per add)
+        // Optimization: Linking only within same category group
+        String cat = c.getCategory();
+        if (cat == null) cat = "General";
+        
         graph.putIfAbsent(c.getId(), new ArrayList<>());
-        for (Complaint other : map.values()) {
-            if (other.getId() != c.getId() && 
-                other.getCategory() != null && 
-                other.getCategory().equalsIgnoreCase(c.getCategory())) {
-                
-                graph.get(c.getId()).add(other.getId());
-                graph.get(other.getId()).add(c.getId());
-            }
+        categoryGroups.putIfAbsent(cat, new ArrayList<>());
+        
+        // Link with existing members of this category group
+        for (int otherId : categoryGroups.get(cat)) {
+            graph.get(c.getId()).add(otherId);
+            graph.get(otherId).add(c.getId());
         }
+        
+        // Add self to category group
+        categoryGroups.get(cat).add(c.getId());
     }
 
     // Called by DAO after successful SQL Insert

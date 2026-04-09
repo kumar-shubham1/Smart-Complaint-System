@@ -7,11 +7,9 @@ import util.AppContext;
 public class ComplaintDAO {
 
     // INSERT
-    public void insertComplaint(Complaint c) {
-        try {
-            Connection conn = DBConnection.getConnection();
-
-            String sql = "INSERT INTO complaints(title, description, category, severity, urgency, impact, priority, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    public void insertComplaint(Complaint c, int userId) {
+        try (Connection conn = DBConnection.getConnection()) {
+            String sql = "INSERT INTO complaints(user_id, title, description, category, severity, urgency, impact, priority, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             if (conn == null) {
                 System.err.println("insertComplaint: DB connection is null");
@@ -20,14 +18,15 @@ public class ComplaintDAO {
 
             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
-            ps.setString(1, c.getTitle());
-            ps.setString(2, c.getDescription());
-            ps.setString(3, c.getCategory());
-            ps.setInt(4, c.getSeverity());
-            ps.setInt(5, c.getUrgency());
-            ps.setInt(6, c.getImpact());
-            ps.setDouble(7, c.getPriority());
-            ps.setString(8, "NEW");
+            ps.setInt(1, userId);
+            ps.setString(2, c.getTitle());
+            ps.setString(3, c.getDescription());
+            ps.setString(4, c.getCategory());
+            ps.setInt(5, c.getSeverity());
+            ps.setInt(6, c.getUrgency());
+            ps.setInt(7, c.getImpact());
+            ps.setDouble(8, c.getPriority());
+            ps.setString(9, "NEW");
 
             int affected = ps.executeUpdate();
 
@@ -43,16 +42,17 @@ public class ComplaintDAO {
             AppContext.service.addComplaint(c);
 
         } catch (Exception e) {
+            System.err.println("❌ Error inserting complaint: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     // USER VIEW
-    public ResultSet getComplaintsByUser() {
+    public ResultSet getComplaintsByUser(int userId) {
         try {
             Connection conn = DBConnection.getConnection();
 
-            String sql = "SELECT id, title, category, priority, status, created_at, updated_at FROM complaints ORDER BY priority DESC";
+            String sql = "SELECT id, title, category, priority, status, created_at, updated_at FROM complaints WHERE user_id = ? ORDER BY priority DESC";
 
             if (conn == null) {
                 System.err.println("getComplaintsByUser: DB connection is null");
@@ -60,10 +60,12 @@ public class ComplaintDAO {
             }
 
             PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, userId);
 
             return ps.executeQuery();
 
         } catch (Exception e) {
+            System.err.println("❌ Error fetching complaints by user: " + e.getMessage());
             e.printStackTrace();
         }
         return null;

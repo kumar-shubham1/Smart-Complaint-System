@@ -13,6 +13,7 @@ public class AdminUI {
         JFrame frame = new JFrame("Admin Panel");
         frame.setSize(400, 500); 
         frame.setLayout(null);
+        frame.setLocationRelativeTo(null); // Center window
 
         // 🔹 Process Button (Greedy + BFS + Explainable AI)
         JButton processBtn = new JButton("Process Complaint");

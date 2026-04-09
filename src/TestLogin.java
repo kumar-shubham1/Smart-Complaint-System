@@ -5,7 +5,7 @@ public class TestLogin {
     public static void main(String[] args) {
         System.out.println("Starting TestLogin");
         try {
-            User user = new User("it_team", "123", "IT");
+            User user = new User(99, "it_team", "123", "IT");
             new TeamUI(user);
             System.out.println("TeamUI initialized successfully!");
         } catch (Exception e) {
